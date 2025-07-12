@@ -22,3 +22,6 @@ if user_input:
 
 for sender, msg in reversed(st.session_state.chat_history):
     st.markdown(f"**{sender}:** {msg}")
+st.markdown(
+    "📎 [Fill out our feedback form (with file upload)](https://forms.gle/H2JjYWdzZ1u8oV7D8)"
+)
