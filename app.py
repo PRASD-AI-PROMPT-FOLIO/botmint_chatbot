@@ -2,6 +2,7 @@ import streamlit as st
 from chatbot import ask_bot
 
 st.set_page_config(page_title="Hospital Bot - BotMint", page_icon="🩺")
+st.image("logo.png", width=150)  # you can adjust width if needed
 st.title("🩺 BotMint Hospital Chatbot")
 
 if "chat_history" not in st.session_state:
