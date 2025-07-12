@@ -1,19 +1,14 @@
+from streamlit_js_eval import streamlit_js_eval
 import pandas as pd
 import csv
 import streamlit as st
 from chatbot import ask_bot
 
-# Set page title and icon
 st.set_page_config(page_title="Hospital Bot - BotMint", page_icon="🩺")
-st.image("logo.png", width=150)
+st.image("logo.png", width=150)  # you can adjust width if needed
 st.title("🩺 BotMint Hospital Chatbot")
-
-# ✅ Initialize chat history before any interaction
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []
-
-# Quick reply buttons
 st.markdown("### 🧭 Quick Questions")
+
 col1, col2 = st.columns(2)
 
 with col1:
@@ -38,24 +33,36 @@ with col2:
         response = ask_bot("Where is the hospital located?")
         st.session_state.chat_history.append({"role": "assistant", "content": response})
 
-# Chat input field
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+
 user_input = st.chat_input("Ask something about the hospital:")
 if user_input:
     st.session_state.chat_history.append({"role": "user", "content": user_input})
     response = ask_bot(user_input)
     st.session_state.chat_history.append({"role": "assistant", "content": response})
+# 🎙 Optional: Voice input section
+st.markdown("---")
+st.markdown("🎙 Or use your voice:")
 
-# Chat history display
+spoken_text = streamlit_js_eval(js_expressions="await window.recognition?.start?.()", key="voice_input")
+
+if spoken_text:
+    st.session_state.chat_history.append({"role": "user", "content": spoken_text})
+    response = ask_bot(spoken_text)
+    st.session_state.chat_history.append({"role": "assistant", "content": response})
+
+# Display chat history using nice formatting
 for msg in st.session_state.chat_history:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-# Google Form (optional)
+# Optional: link to Google Form
 st.markdown("---")
 st.markdown("📎 [Fill out our feedback form (with file upload)](https://forms.gle/YOUR_PUBLIC_FORM_LINK)")
-
-# Export to CSV
+# Convert chat history to DataFrame
 chat_data = pd.DataFrame(st.session_state.chat_history)
+# Download button
 csv = chat_data.to_csv(index=False).encode('utf-8')
 st.download_button(
     label="💾 Download Chat as CSV",
@@ -63,4 +70,3 @@ st.download_button(
     file_name='chat_history.csv',
     mime='text/csv',
 )
-
