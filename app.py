@@ -1,31 +1,4 @@
-spoken_text = streamlit_js_eval(
-    js_expressions="""
-        new Promise((resolve, reject) => {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                resolve("Voice recognition not supported in this browser.");
-                return;
-            }
-
-            const recognition = new SpeechRecognition();
-            recognition.lang = "en-US";
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
-
-            recognition.onresult = (event) => {
-                resolve(event.results[0][0].transcript);
-            };
-
-            recognition.onerror = (event) => {
-                resolve("Voice recognition error: " + event.error);
-            };
-
-            recognition.start();
-        });
-    """,
-    key="voice_input"
-)
-
+from streamlit_js_eval import streamlit_js_eval
 import pandas as pd
 import csv
 import streamlit as st
@@ -68,11 +41,38 @@ if user_input:
     st.session_state.chat_history.append({"role": "user", "content": user_input})
     response = ask_bot(user_input)
     st.session_state.chat_history.append({"role": "assistant", "content": response})
+
 # 🎙 Optional: Voice input section
 st.markdown("---")
 st.markdown("🎙 Or use your voice:")
 
-spoken_text = streamlit_js_eval(js_expressions="await window.recognition?.start?.()", key="voice_input")
+spoken_text = streamlit_js_eval(
+    js_expressions="""
+        new Promise((resolve, reject) => {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                resolve("Voice recognition not supported in this browser.");
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = "en-US";
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.onresult = (event) => {
+                resolve(event.results[0][0].transcript);
+            };
+
+            recognition.onerror = (event) => {
+                resolve("Voice recognition error: " + event.error);
+            };
+
+            recognition.start();
+        });
+    """,
+    key="voice_input"
+)
 
 if spoken_text:
     st.session_state.chat_history.append({"role": "user", "content": spoken_text})
